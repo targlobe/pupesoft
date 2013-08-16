@@ -1115,7 +1115,7 @@
 					}
 
 					$vastaavat_html .= "<tr><th>".t("Vastaava")." ".t("Tuoteno")."</th><th>".t("Nimitys")."</th><th>".t("Myytävissä")."</th><th>".t("Myyntihinta")."</th>";
-					if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S') $alku .= "<th>".t("Tehtaan saldo")."</th>";
+					if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S') $vastaavat_html .= "<th>".t("Tehtaan saldo")."</th>";
 					$vastaavat_html .= "<th>";
 
 					if ($vastaavattuotteet == 0) {
