@@ -8,6 +8,8 @@
 	$varaosavirhe 			= "";
 	$vastaavat_html			= "";
 
+	$sahkoinen_tilausliitanta = @file_exists("../inc/sahkoinen_tilausliitanta.inc") ? true : false;
+
 	$tquery	= "SELECT * from tuote where yhtio='$kukarow[yhtio]' and tuoteno='$row[tuoteno]'";
 	$tres	= pupe_query($tquery);
 	$trow 	= mysql_fetch_assoc($tres); // haetaan tuotteen tiedot..
@@ -1076,7 +1078,7 @@
 
 				$alku = "<table width='100%'><tr><th>".t("Vastaava")." ".t("Tuoteno")."</th><th>".t("Nimitys")."</th><th>".t("Myytävissä")."</th><th>".t("Myyntihinta")."</th>";
 
-				if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S' or $yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'A') $alku .= "<th>".t("Tehtaan saldo")."</th>";
+				if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S' or $yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'A') $alku .= "<th>".t("Tehtaan saldo")."</th><th>".t("Tehtaan saldo päivitetty")."</th>";
 
 				$alku .= "<th><form method='post' name='hyvaksy'>
 									<input type='hidden' name='toim' 			value = '$toim'>
@@ -1092,6 +1094,9 @@
 									<input type='hidden' name='vastaavienkasittely' value = 'kylla'>
 									<input type='Submit' value='".t("Piilota vastaavat tuotteet")."'>
 									</form></th>";
+
+				if ($sahkoinen_tilausliitanta) $alku .= "<th>".t("Tarkista tehtaan saldo")."</th>";
+
 				$alku .= "</tr>";
 
 				if ($row['kommentti'] != "") {
@@ -1128,9 +1133,14 @@
 						 			."<td align='right'>".sprintf("%.2f", $vmyytavissa)."</td>"
 						 			."<td align='right'>".sprintf("%.2f", $V_hinta)."</td>";
 
+						 $tuotteen_toimittajan_tunnus = 0;
+
 						 if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S' or $yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'A') {
 
-						 	$query = "	SELECT tehdas_saldo, IF(jarjestys = 0, 9999, jarjestys) sorttauskentta
+						 	$query = "	SELECT tehdas_saldo,
+						 				tehdas_saldo_paivitetty,
+						 				liitostunnus,
+						 				IF(jarjestys = 0, 9999, jarjestys) sorttauskentta
 						 				FROM tuotteen_toimittajat
 						 				WHERE yhtio = '{$kukarow['yhtio']}'
 						 				AND tuoteno = '{$vrow['tuoteno']}'
@@ -1139,7 +1149,15 @@
 						 	$tehdas_saldo_res = pupe_query($query);
 						 	$tehdas_saldo_row = mysql_fetch_assoc($tehdas_saldo_res);
 
-						 	$vastaavat_html .= "<td align='right'>".sprintf("%.2f", $tehdas_saldo_row['tehdas_saldo'])."</td>";
+						 	$tuotteen_toimittajan_tunnus = $tehdas_saldo_row['liitostunnus'];
+						 	$tehtaan_saldon_font = $tehdas_saldo_row['tehdas_saldo'] < 1 ? "error" : "";
+
+						 	$vastaavat_html .= "<td align='right'>";
+
+						 	if ($sahkoinen_tilausliitanta) $vastaavat_html .= "<div class='availability' id='{$vrow['tunnus']}_availability' /><span id='{$vrow['tunnus']}_loading'></span></div>&nbsp;";
+
+						 	$vastaavat_html .= "<font class='{$tehtaan_saldon_font}'>".sprintf("%.2f", $tehdas_saldo_row['tehdas_saldo'])."</font></td>";
+							$vastaavat_html .= "<td align='right'>".tv1dateconv($tehdas_saldo_row['tehdas_saldo_paivitetty'], "PITKA")."</td>";
 						 }
 
 						 $vastaavat_html .= "<td align='left'>"
@@ -1148,7 +1166,7 @@
 						 			   	<input type='hidden' name='lopetus' 		value = '$lopetus'>
 						 			   	<input type='hidden' name='ruutulimit' 		value = '$ruutulimit'>
 						 			   	<input type='hidden' name='projektilla' 	value = '$projektilla'>
-						 			   	<input type='hidden' name='tilausnumero' 	value = '$tilausnumero'>
+						 			   	<input type='hidden' id='tilausnumero' name='tilausnumero' 	value = '$tilausnumero'>
 						 			   	<input type='hidden' name='mista' 			value = '$mista'>
 						 			   	<input type='hidden' name='rivitunnus' 		value = '$row[tunnus]'>
 						 			   	<input type='hidden' name='vastaavatuoteno' value = '$vrow[tuoteno]'>
@@ -1157,7 +1175,34 @@
 						 			   	<input type='hidden' name='tapa' 			value = 'MYYVASTAAVA'>
 						 			   	<input type='Submit' value='".t("Tilaa tuote")."'>
 						 			   	</form> "
-						 			."</td></tr>";
+						 			."</td>";
+
+			 			if ($sahkoinen_tilausliitanta) {
+
+			 				$vastaavat_html .= "<td>";
+
+			 				if ($tuotteen_toimittajan_tunnus != 0) {
+
+			 					$query = "	SELECT sahkoinen_tilausliitanta
+			 								FROM toimi
+			 								WHERE yhtio = '{$kukarow['yhtio']}'
+			 								AND tunnus = '{$tuotteen_toimittajan_tunnus}'";
+			 					$tt_chk_res = pupe_query($query);
+			 					$tt_chk_row = mysql_fetch_assoc($tt_chk_res);
+
+			 					if ($tt_chk_row['sahkoinen_tilausliitanta'] == 'F') {
+
+			 						$hae = 'nappi';
+			 						$rivitunnus = $row['tunnus'];
+
+			 						require("inc/sahkoinen_tilausliitanta.inc");
+			 					}
+			 				}
+
+			 				$vastaavat_html .= "</td>";
+			 			}
+
+						 $vastaavat_html .= "</tr>";
 					}
 				}
 
