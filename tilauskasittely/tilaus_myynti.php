@@ -6,6 +6,29 @@ if (isset($_REQUEST['tulosta_maksusopimus']) and is_numeric(trim($_REQUEST['tulo
 	$ohje = 'off';
 }
 
+if (isset($_REQUEST['ajax_toiminto']) and trim($_REQUEST['ajax_toiminto']) == 'tarkista_tehtaan_saldot') {
+
+	if (@file_exists("../inc/sahkoinen_tilausliitanta.inc")) {
+
+		if (@include_once("../inc/functions.inc"));
+		elseif (@include_once("functions.inc"));
+		else exit;
+
+		$hae = 'tarkista_tehtaan_saldot';
+		$tunnus = (int) $_REQUEST['id'];
+		$otunnus = (int) $_REQUEST['otunnus'];
+		$tuoteno = (int) $_REQUEST['tuoteno'];
+
+		require("../inc/sahkoinen_tilausliitanta.inc");
+
+	}
+
+	if (!isset($data)) $data = array();
+
+	echo json_encode($data);
+	exit;
+}
+
 if (@include("../inc/parametrit.inc"));
 elseif (@include("parametrit.inc"));
 else exit;
