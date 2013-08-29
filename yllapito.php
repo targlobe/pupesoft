@@ -354,6 +354,8 @@
 				// Taulun ensimmäinen kenttä on aina yhtiö
 				$query = "INSERT into $toim SET yhtio='$kukarow[yhtio]', laatija='$kukarow[kuka]', luontiaika=now(), muuttaja='$kukarow[kuka]', muutospvm=now() ";
 
+				if ($toim == 'tuotteen_toimittajat') $query .= ", tehdas_saldo_paivitetty=now() ";
+
 				for ($i=1; $i < mysql_num_fields($result); $i++) {
 					// Tuleeko tämä columni käyttöliittymästä
 					if (isset($t[$i])) {
@@ -413,6 +415,8 @@
 
 				// Taulun ensimmäinen kenttä on aina yhtiö
 				$query = "UPDATE $toim SET muuttaja='$kukarow[kuka]', muutospvm=now() ";
+
+				if ($toim == 'tuotteen_toimittajat') $query .= ", tehdas_saldo_paivitetty=now() ";
 
 				for ($i=1; $i < mysql_num_fields($result); $i++) {
 					if (isset($t[$i]) or (isset($_FILES["liite_$i"]) and is_array($_FILES["liite_$i"]))) {
@@ -1006,6 +1010,9 @@
 			}
 			elseif ($from == "yllapito" and $toim == "tuotteen_toimittajat_tuotenumerot" and trim($array[$i]) == "tuoteno") {
 				$lisa .= " and toim_tuoteno_tunnus {$hakuehto} ";
+			}
+			elseif ($from == "yllapito" and $toim == "yhtion_toimipaikat_avainsanat" and trim($array[$i]) == "laji") {
+				$lisa .= " and yhtion_toimipaikan_tunnus {$hakuehto} ";
 			}
 			elseif ($from == "yllapito" and ($toim == 'rahtisopimukset' or $toim == 'asiakasalennus' or $toim == 'kohde' or $toim == 'asiakashinta') and trim($array[$i]) == 'asiakas') {
 
@@ -1687,7 +1694,8 @@
 			if (mysql_field_name($result, $i) == "laatija" or
 				mysql_field_name($result, $i) == "muutospvm" or
 				mysql_field_name($result, $i) == "muuttaja" or
-				mysql_field_name($result, $i) == "luontiaika") {
+				mysql_field_name($result, $i) == "luontiaika" or
+				mysql_field_name($result, $i) == "tehdas_saldo_paivitetty") {
 				$tyyppi = 2;
 			}
 
@@ -2047,6 +2055,17 @@
 			}
 		}
 
+		if ($trow["tunnus"] > 0 and $errori == '' and $toim == 'yhtion_toimipaikat') {
+			if (($toikrow = tarkista_oikeus("yllapito.php", "yhtion_toimipaikat_avainsanat%", "", "OK")) !== FALSE) {
+				$lukitse_avaimeen = urlencode($yhtion_toimipaikat_tunnus);
+
+				echo "<tr><td class='back'></td></tr>";
+				echo "<tr><td class='back'>";
+				echo "<iframe id='yhtion_toimipaikat_avainsanat_iframe' name='yhtion_toimipaikat_avainsanat_iframe' src='yllapito.php?toim={$toikrow['alanimi']}&from=yllapito&ohje=off&haku[1]=@{$lukitse_avaimeen}&lukitse_avaimeen={$lukitse_avaimeen}' style='width: 600px; border: 0px; display: block;' border='0' frameborder='0'></iFrame>";
+				echo "</td></tr>";
+			}
+		}
+
 		echo "</table>";
 	}
 	elseif ($toim != "yhtio" and $toim != "yhtion_parametrit"  and $uusilukko == "" and $from == "") {
@@ -2055,7 +2074,7 @@
 				if (isset($liitostunnus)) echo "&liitostunnus={$liitostunnus}";
 				if (isset($status) and $toim == 'tuote') echo "&status={$status}";
 				echo "' method = 'post'>
-				
+
 				<input type = 'hidden' name = 'toim' value = '$aputoim'>
 				<input type = 'hidden' name = 'js_open_yp' value = '$js_open_yp'>
 				<input type = 'hidden' name = 'limit' value = '$limit'>

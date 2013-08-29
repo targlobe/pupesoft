@@ -121,5 +121,3 @@
 		$ulos = "<td><input type = 'text' name = '$nimi' value = '$trow[$i]' size='$size' maxlength='" . mysql_field_len($result,$i) ."'>";
 		$jatko = 0;
 	}
-
-?>
