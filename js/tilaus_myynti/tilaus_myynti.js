@@ -73,7 +73,7 @@ function bind_tarkista_tehtaan_saldot_click() {
 				var data = jQuery.parseJSON(return_value);
 				$('#'+data.id+'_loading').html('');
 
-				$('#'+data.id+'_availability').css({'background-color': bgcolors[data.saldo[0]]}).show();
+				$('#'+data.id+'_availability').css({'background-color': bgcolors[data.saldo]}).show();
 			}
 		);
 	});
