@@ -74,7 +74,7 @@ function bind_tarkista_tehtaan_saldot_click() {
 				$('#'+data.id+'_loading').html('');
 
 				if (data.saldo < 0) $('#'+data.id+'_availability').html("<img src='../pics/lullacons/alert.png' />");
-				else $('#'+data.id+'_availability').css({'background-color': bgcolors[data.saldo]}).show();
+				else $('#'+data.id+'_availability').html('').css({'background-color': bgcolors[data.saldo]}).show();
 			}
 		);
 	});
