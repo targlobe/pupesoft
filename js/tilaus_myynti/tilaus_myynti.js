@@ -73,8 +73,16 @@ function bind_tarkista_tehtaan_saldot_click() {
 				var data = jQuery.parseJSON(return_value);
 				$('#'+data.id+'_loading').html('');
 
-				if (data.saldo < 0) $('#'+data.id+'_availability').html("<img src='../pics/lullacons/alert.png' />");
-				else $('#'+data.id+'_availability').html('').css({'background-color': bgcolors[data.saldo]}).show();
+				if (data.saldo < 0) {
+					$('#'+data.id+'_availability')
+					.html("<img src='../pics/lullacons/alert.png' />");
+				}
+				else {
+					$('#'+data.id+'_availability')
+					.html('')
+					.css({'background-color': bgcolors[data.saldo]})
+					.show();
+				}
 			}
 		);
 	});
