@@ -58,6 +58,10 @@ function bind_tarkista_tehtaan_saldot_click() {
 		$otunnus = $('#tilausnumero').val();
 		$tuoteno = $('#'+$id+'_tuoteno').val();
 
+		$cust_id = $('#'+$id+'_custid').val();
+		$username = $('#'+$id+'_username').val();
+		$password = $('#'+$id+'_password').val();
+
 		$('#'+$id+'_loading').html("<img id='"+$id+"_image' src='../pics/loading_blue_small.gif' />");
 
 		$.post('',
@@ -65,6 +69,9 @@ function bind_tarkista_tehtaan_saldot_click() {
 			id: $id,
 			otunnus: $otunnus,
 			tuoteno: $tuoteno,
+			cust_id: $cust_id,
+			username: $username,
+			password: $password,
 			ajax_toiminto: 'tarkista_tehtaan_saldot',
 			no_head: 'yes',
 			ohje: 'off'
