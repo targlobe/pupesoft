@@ -62,6 +62,8 @@ function bind_tarkista_tehtaan_saldot_click() {
 		$username = $('#'+$id+'_username').val();
 		$password = $('#'+$id+'_password').val();
 
+		$tt_tunnus = $('#'+$id+'_tt_tunnus').val();
+
 		$('#'+$id+'_loading').html("<img id='"+$id+"_image' src='../pics/loading_blue_small.gif' />");
 
 		$.post('',
@@ -72,6 +74,7 @@ function bind_tarkista_tehtaan_saldot_click() {
 			cust_id: $cust_id,
 			username: $username,
 			password: $password,
+			tt_tunnus: $tt_tunnus,
 			ajax_toiminto: 'tarkista_tehtaan_saldot',
 			no_head: 'yes',
 			ohje: 'off'
@@ -91,6 +94,8 @@ function bind_tarkista_tehtaan_saldot_click() {
 						'background-color': bgcolors[data.saldo]})
 					.show();
 				}
+
+				$('#'+data.id+'_tehdas_saldo_paivitetty').html(data.tehdas_saldo_paivitetty);
 			}
 		);
 	});

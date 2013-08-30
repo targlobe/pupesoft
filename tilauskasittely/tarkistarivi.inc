@@ -1140,6 +1140,7 @@
 						 	$query = "	SELECT tt.tehdas_saldo,
 						 				tt.tehdas_saldo_paivitetty,
 						 				tt.liitostunnus,
+						 				tt.tunnus AS tt_tunnus,
 						 				toimi.sahkoinen_tilausliitanta,
 						 				IF(tt.jarjestys = 0, 9999, tt.jarjestys) sorttauskentta
 						 				FROM tuotteen_toimittajat AS tt
@@ -1174,6 +1175,7 @@
 							 		$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_custid' value='{$yta_chk_row['tarkenne']}' />";
 								 	$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_username' value='{$yta_chk_row['tarkenne_2']}' />";
 									$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_password' value='{$yta_chk_row['tarkenne_3']}' />";
+									$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_tt_tunnus' value='{$tehdas_saldo_row['tt_tunnus']}' />";
 						 		}
 						 		else {
 						 			$tehdas_saldo_row['sahkoinen_tilausliitanta'] = '';
@@ -1181,7 +1183,7 @@
 						 	}
 
 						 	$vastaavat_html .= "<font class='{$tehtaan_saldon_font}'>".sprintf("%.2f", $tehdas_saldo_row['tehdas_saldo'])."</font></td>";
-							$vastaavat_html .= "<td align='right'>".tv1dateconv($tehdas_saldo_row['tehdas_saldo_paivitetty'], "PITKA")."</td>";
+							$vastaavat_html .= "<td id='{$vrow['tunnus']}_tehdas_saldo_paivitetty' align='right'>".tv1dateconv($tehdas_saldo_row['tehdas_saldo_paivitetty'], "PITKA")."</td>";
 						 }
 
 						 $vastaavat_html .= "<td align='left'>"

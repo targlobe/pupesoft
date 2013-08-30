@@ -7,23 +7,28 @@ if (isset($_REQUEST['tulosta_maksusopimus']) and is_numeric(trim($_REQUEST['tulo
 }
 
 if (isset($_REQUEST['ajax_toiminto']) and trim($_REQUEST['ajax_toiminto']) == 'tarkista_tehtaan_saldot') {
+	$nayta_pdf = 1;
+	$ohje = 'off';
+}
+
+if (@include("../inc/parametrit.inc"));
+elseif (@include("parametrit.inc"));
+else exit;
+
+if (isset($ajax_toiminto) and trim($ajax_toiminto) == 'tarkista_tehtaan_saldot') {
 
 	if (@file_exists("../inc/sahkoinen_tilausliitanta.inc")) {
 
-		if (@include_once("../inc/functions.inc"));
-		elseif (@include_once("functions.inc"));
-		else exit;
-
 		$hae = 'tarkista_tehtaan_saldot';
-		$tunnus = (int) $_REQUEST['id'];
-		$otunnus = (int) $_REQUEST['otunnus'];
-		$tuoteno = (int) $_REQUEST['tuoteno'];
-		$cust_id = $_REQUEST['cust_id'];
-		$username = $_REQUEST['username'];
-		$password = $_REQUEST['password'];
+		$tunnus = (int) $id;
+		$otunnus = (int) $otunnus;
+		$tuoteno = (int) $tuoteno;
+		$cust_id = $cust_id;
+		$username = $username;
+		$password = $password;
+		$tt_tunnus = (int) $tt_tunnus;
 
-		require("../inc/sahkoinen_tilausliitanta.inc");
-
+		require("inc/sahkoinen_tilausliitanta.inc");
 	}
 
 	if (!isset($data)) $data = array();
@@ -31,10 +36,6 @@ if (isset($_REQUEST['ajax_toiminto']) and trim($_REQUEST['ajax_toiminto']) == 't
 	echo json_encode($data);
 	exit;
 }
-
-if (@include("../inc/parametrit.inc"));
-elseif (@include("parametrit.inc"));
-else exit;
 
 if (isset($livesearch_tee) and $livesearch_tee == "SARJANUMEROHAKU") {
 	livesearch_sarjanumerohaku();
