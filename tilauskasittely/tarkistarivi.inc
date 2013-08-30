@@ -1153,7 +1153,7 @@
 						 	$tehdas_saldo_row = mysql_fetch_assoc($tehdas_saldo_res);
 
 						 	$tuotteen_toimittajan_tunnus = $tehdas_saldo_row['liitostunnus'];
-						 	$tehtaan_saldon_font = $tehdas_saldo_row['tehdas_saldo'] < 1 ? "error" : "";
+						 	$tehtaan_saldon_font = $tehdas_saldo_row['tehdas_saldo'] < 1 ? "error" : "ok";
 
 						 	$vastaavat_html .= "<td align='right'>";
 
