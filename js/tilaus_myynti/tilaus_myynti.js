@@ -58,7 +58,7 @@ function bind_tarkista_tehtaan_saldot_click() {
 		$otunnus = $('#tilausnumero').val();
 		$tuoteno = $('#'+$id+'_tuoteno').val();
 
-		$('#'+$id+'_loading').html("<img src='../pics/loading_blue_small.gif' />");
+		$('#'+$id+'_loading').html("<img id='"+$id+"_image' src='../pics/loading_blue_small.gif' />");
 
 		$.post('',
 			{
@@ -71,16 +71,17 @@ function bind_tarkista_tehtaan_saldot_click() {
 			},
 			function(return_value) {
 				var data = jQuery.parseJSON(return_value);
-				$('#'+data.id+'_loading').html('');
+				$('#'+data.id+'_image').remove();
 
 				if (data.saldo < 0) {
 					$('#'+data.id+'_availability')
-					.html("<img src='../pics/lullacons/alert.png' />");
+					.css({'background-image': 'url(../pics/lullacons/alert.png)'});
 				}
 				else {
 					$('#'+data.id+'_availability')
-					.html('')
-					.css({'background-color': bgcolors[data.saldo]})
+					.css({
+						'background-image': 'none',
+						'background-color': bgcolors[data.saldo]})
 					.show();
 				}
 			}
