@@ -18,6 +18,9 @@ if (isset($_REQUEST['ajax_toiminto']) and trim($_REQUEST['ajax_toiminto']) == 't
 		$tunnus = (int) $_REQUEST['id'];
 		$otunnus = (int) $_REQUEST['otunnus'];
 		$tuoteno = (int) $_REQUEST['tuoteno'];
+		$cust_id = $_REQUEST['cust_id'];
+		$username = $_REQUEST['username'];
+		$password = $_REQUEST['password'];
 
 		require("../inc/sahkoinen_tilausliitanta.inc");
 
