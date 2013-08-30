@@ -1137,13 +1137,15 @@
 
 						 if ($yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'S' or $yhtiorow['vastaavat_tuotteet_esitysmuoto'] == 'A') {
 
-						 	$query = "	SELECT tehdas_saldo,
-						 				tehdas_saldo_paivitetty,
-						 				liitostunnus,
-						 				IF(jarjestys = 0, 9999, jarjestys) sorttauskentta
-						 				FROM tuotteen_toimittajat
-						 				WHERE yhtio = '{$kukarow['yhtio']}'
-						 				AND tuoteno = '{$vrow['tuoteno']}'
+						 	$query = "	SELECT tt.tehdas_saldo,
+						 				tt.tehdas_saldo_paivitetty,
+						 				tt.liitostunnus,
+						 				toimi.sahkoinen_tilausliitanta,
+						 				IF(tt.jarjestys = 0, 9999, tt.jarjestys) sorttauskentta
+						 				FROM tuotteen_toimittajat AS tt
+						 				JOIN toimi ON (toimi.yhtio = tt.yhtio AND toimi.tunnus = tt.liitostunnus)
+						 				WHERE tt.yhtio = '{$kukarow['yhtio']}'
+						 				AND tt.tuoteno = '{$vrow['tuoteno']}'
 						 				ORDER BY sorttauskentta
 						 				LIMIT 1";
 						 	$tehdas_saldo_res = pupe_query($query);
@@ -1154,7 +1156,29 @@
 
 						 	$vastaavat_html .= "<td align='right'>";
 
-						 	if ($sahkoinen_tilausliitanta) $vastaavat_html .= "<div class='availability' id='{$vrow['tunnus']}_availability' /><span id='{$vrow['tunnus']}_loading'></span></div>&nbsp;";
+						 	if ($sahkoinen_tilausliitanta and $tehdas_saldo_row['sahkoinen_tilausliitanta'] == 'F' and $laskurow['yhtio_toimipaikka'] != 0) {
+
+						 		$query = "	SELECT *
+						 					FROM yhtion_toimipaikat_avainsanat
+						 					WHERE yhtio = '{$kukarow['yhtio']}'
+						 					AND laji = 'toimittaja'
+						 					AND avainsana = '{$tuotteen_toimittajan_tunnus}'
+						 					LIMIT 1";
+						 		$yta_chk_res = pupe_query($query);
+
+						 		if (mysql_num_rows($yta_chk_res) == 1)  {
+
+						 			$yta_chk_row = mysql_fetch_assoc($yta_chk_res);
+
+						 			$vastaavat_html .= "<div class='availability' id='{$vrow['tunnus']}_availability' /><span id='{$vrow['tunnus']}_loading'></span></div>&nbsp;";
+							 		$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_custid' value='{$yta_chk_row['tarkenne']}' />";
+								 	$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_username' value='{$yta_chk_row['tarkenne_2']}' />";
+									$vastaavat_html .= "<input type='hidden' id='{$vrow['tunnus']}_password' value='{$yta_chk_row['tarkenne_3']}' />";
+						 		}
+						 		else {
+						 			$tehdas_saldo_row['sahkoinen_tilausliitanta'] = '';
+						 		}
+						 	}
 
 						 	$vastaavat_html .= "<font class='{$tehtaan_saldon_font}'>".sprintf("%.2f", $tehdas_saldo_row['tehdas_saldo'])."</font></td>";
 							$vastaavat_html .= "<td align='right'>".tv1dateconv($tehdas_saldo_row['tehdas_saldo_paivitetty'], "PITKA")."</td>";
@@ -1181,7 +1205,7 @@
 
 			 				$vastaavat_html .= "<td>";
 
-			 				if ($tuotteen_toimittajan_tunnus != 0) {
+			 				if ($tuotteen_toimittajan_tunnus != 0 and $tehdas_saldo_row['sahkoinen_tilausliitanta'] == 'F' and $laskurow['yhtio_toimipaikka'] != 0) {
 
 			 					$query = "	SELECT sahkoinen_tilausliitanta
 			 								FROM toimi
