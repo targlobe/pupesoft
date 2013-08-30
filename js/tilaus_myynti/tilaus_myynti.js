@@ -81,7 +81,16 @@ function bind_tarkista_tehtaan_saldot_click() {
 			},
 			function(return_value) {
 				var data = jQuery.parseJSON(return_value);
+
 				$('#'+data.id+'_image').remove();
+
+				if (data.error) {
+					$('#'+data.id+'_availability')
+					.css({'background-image': 'url(../pics/lullacons/alert.png)'});
+
+					alert(data.error_msg);
+					return;
+				}
 
 				if (data.saldo < 0) {
 					$('#'+data.id+'_availability')
